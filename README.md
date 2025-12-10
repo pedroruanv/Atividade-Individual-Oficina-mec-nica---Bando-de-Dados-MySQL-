@@ -1,253 +1,141 @@
-README – Sistema de Gestão de Posto de Combustível
+⛽ Sistema de Gestão de Posto de Combustível
 
-🏗️ Descrição do Projeto
+Este projeto representa o modelo de banco de dados para um sistema de gerenciamento de um posto de combustível, incluindo funcionalidades de vendas, empregados, departamentos, controle de combustíveis e volumes, e cadastros de clientes e dependentes.
 
-Este projeto é um sistema de banco de dados relacional para um posto de combustível, permitindo gerenciar:
+🗂️ Estrutura do Banco de Dados
 
-Funcionários e departamentos
+O modelo utiliza MySQL e inclui as seguintes entidades principais:
 
-Vendas de combustíveis
+👤 EMPREGADO
 
-Bombas de combustível e volume abastecido
+Descrição: Armazena informações sobre os empregados do posto.
 
-Telefones e endereços de funcionários
+Atributos principais:
 
-Dependentes de funcionários
+cpf_empregado (PK)
 
-Formas de pagamento
+nome
 
-Itens vendidos por venda
+sexo (ENUM 'M', 'F')
 
-O banco foi modelado seguindo normas de normalização e garantindo integridade referencial.
+salario
 
+DEPARTAMENTO_idDEPARTAMENTO (FK, obrigatório)
 
-
-📂 Estrutura das Tabelas
-
-1. DEPARTAMENTO
-
-Descrição: Armazena informações dos departamentos do posto.
-
-Atributos:
-
-idDEPARTAMENTO INT – PK
-
-nome VARCHAR(45)
-
-email VARCHAR(100)
-
-descricao VARCHAR(200)
-
-local VARCHAR(100)
-
-cpf_gerente CHAR(11)
+ENDEREÇO_idENDEREÇO (FK, opcional)
 
 Relacionamentos:
 
-1:N com EMPREGADO (DEPARTAMENTO_idDEPARTAMENTO)
+Cada empregado pertence a um departamento (linha contínua).
 
-2. EMPREGADO
+Pode ter telefone(s) (opcional, tracejada).
 
-Descrição: Armazena informações dos funcionários.
+Pode ter dependentes (opcional, tracejada).
 
-Atributos:
+Pode realizar vendas (opcional, tracejada).
 
-cpf_empregado CHAR(11) – PK
+🏢 DEPARTAMENTO
 
-nome VARCHAR(100)
-
-sexo ENUM('M', 'F')
-
-salario DECIMAL(10,2)
-
-DEPARTAMENTO_idDEPARTAMENTO INT – FK
-
-ENDERECO_idENDERECO INT – FK
-
-Relacionamentos:
-
-1:N com TELEFONE, DEPENDENTES, VENDAS
-
-N:1 com DEPARTAMENTO
-
-1:1 com ENDEREÇO
-
-3. TELEFONE
-
-Descrição: Telefones dos funcionários.
+Descrição: Guarda informações sobre departamentos do posto.
 
 Atributos:
 
-idTELEFONE INT – PK
+idDEPARTAMENTO (PK)
 
-numero VARCHAR(20)
+nome, email, descricao, local
 
-EMPREGADO_cpf_empregado CHAR(11) – FK
+cpf_gerente (FK opcional)
 
-Relacionamento: N:1 → EMPREGADO
+Relacionamento:
 
-Ação sugerida: ON DELETE CASCADE, ON UPDATE CASCADE
+Um departamento pode ter vários empregados.
 
-4. ENDEREÇO
+🏠 ENDEREÇO
 
-Descrição: Endereços dos funcionários.
-
-Atributos:
-
-idENDERECO INT – PK
-
-cidade VARCHAR(45)
-
-bairro VARCHAR(45)
-
-rua VARCHAR(100)
-
-numero INT
-
-complemento VARCHAR(50)
-
-cep VARCHAR(9)
-
-Relacionamento: 1:1 → EMPREGADO
-
-5. DEPENDENTES
-
-Descrição: Dependentes dos funcionários.
+Descrição: Registra os endereços dos empregados.
 
 Atributos:
 
-CPF VARCHAR(11) – PK
+idENDEREÇO (PK)
 
-nome VARCHAR(100)
+cidade, bairro, rua, numero, complemento, cep
 
-DataNasc DATE
+Relacionamento:
 
-parentesco VARCHAR(50)
+Pode estar associado a um empregado (opcional, tracejada).
 
-EMPREGADO_cpf_empregado CHAR(11) – FK
+📞 TELEFONE
 
-Relacionamento: N:1 → EMPREGADO
+Descrição: Contém os números de telefone dos empregados.
 
-Ação sugerida: ON DELETE CASCADE, ON UPDATE CASCADE
+Relacionamento:
 
-6. FORMAS_DE_PAGAMENTO
+Cada telefone pertence a um empregado (opcional, tracejada).
 
-Descrição: Armazena os tipos de pagamento disponíveis.
+👶 DEPENDENTES
 
-Atributos:
-
-idFORMAS_PAG INT – PK
-
-cartao CHAR(150)
-
-pix CHAR(150)
-
-especie DECIMAL(10,2)
-
-Relacionamento: 1:N com VENDAS
-
-7. VENDAS
-
-Descrição: Registro de vendas realizadas.
+Descrição: Cadastro de dependentes de cada empregado.
 
 Atributos:
 
-idVENDAS INT – PK
+CPF (PK)
 
-data DATE
+nome, DataNasc, parentesco
 
-valorTOTAL DECIMAL(10,2)
+EMPREGADO_cpf_empregado (FK)
 
-FORMAS_PAG_idFORMAS_PAG INT – FK
+Relacionamento:
 
-EMPREGADO_cpf_empregado CHAR(11) – FK
+Cada dependente está vinculado a um empregado (opcional, tracejada).
 
-BOMBOMB_idBOMBCOMB INT – FK
+💰 VENDAS
 
-Relacionamentos:
-
-1:N com ITENS_VENDAS
-
-N:1 com EMPREGADO, BOMBA_DE_COMBUSTÍVEL, FORMAS_DE_PAGAMENTO
-
-8. ITENS_VENDAS
-
-Descrição: Itens vendidos por cada venda.
+Descrição: Armazena as vendas realizadas no posto.
 
 Atributos:
 
-idITENS_VENDAS INT – PK
+idVENDAS (PK)
 
-combustiveis VARCHAR(?)
+data
 
-VENDAS_idVENDAS INT – FK
+valorTOTAL
 
-Relacionamento: N:1 → VENDAS
+EMPREGADO_cpf_empregado (FK, obrigatório)
 
-9. BOMBA_DE_COMBUSTÍVEL
+BOMBCOMB_idBOMBCOMB (FK)
 
-Descrição: Bombas de combustível do posto.
+FORMAS_PAG_idFORMAS_PAG (FK)
 
-Atributos:
+Relacionamento:
 
-idBOMBCOMB INT – PK
+Cada venda é realizada por um empregado (linha contínua).
 
-DataHora_Abastecimento DATETIME
+Pode incluir itens de venda (opcional, tracejada).
 
-Relacionamentos:
+🛢️ COMBUSTÍVEL
 
-1:N com VENDAS
+Descrição: Registra os tipos de combustíveis disponíveis.
 
-1:N com VOLUME
+Relacionamento:
 
-10. COMBUSTÍVEL
+Cada combustível pode estar em vários itens de venda (opcional, tracejada).
 
-Descrição: Tipos de combustível disponíveis.
+📦 ITENS_VENDA
 
-Atributos:
+Descrição: Detalha os combustíveis vendidos em cada venda.
 
-idItem_COMBUSTIVEL INT – PK
+Relacionamento:
 
-nome VARCHAR(100)
+Cada item pertence a uma venda e um tipo de combustível.
 
-quantidade INT
+🛠️ FORMAS_PAG
 
-valor DECIMAL(10,2)
+Descrição: Guarda os métodos de pagamento disponíveis (cartão, PIX, espécie).
 
-BOMBOMB_idBOMBCOMB INT – FK
+⛽ BOMBCOMB
 
-11. VOLUME
+Descrição: Registra os abastecimentos realizados nas bombas.
 
-Descrição: Volume abastecido em cada bomba.
+📊 VOLUME
 
-Atributos:
-
-idVOLUME INT – PK
-
-BOMBOMB_idBOMBCOMB INT – FK
-
-🔗 Resumo dos Relacionamentos
-
-1:N → DEPARTAMENTO → EMPREGADO
-
-1:N → EMPREGADO → TELEFONE, DEPENDENTES, VENDAS
-
-1:1 → EMPREGADO → ENDEREÇO
-
-1:N → VENDAS → ITENS_VENDAS
-
-1:N → BOMBA_DE_COMBUSTÍVEL → VENDAS, VOLUME
-
-1:N → FORMAS_DE_PAGAMENTO → VENDAS
-
-1:N → COMBUSTÍVEL → ITENS_VENDAS
-
-⚙️ Observações
-
-Todas as tabelas filhas recebem FK apontando para a tabela pai.
-
-Uso de ON DELETE CASCADE em tabelas dependentes (TELEFONE, DEPENDENTES, ITENS_VENDAS) para manter integridade.
-
-O modelo permite gerar relatórios detalhados por vendas, funcionário, bomba, combustível e forma de pagamento.
-
-Segue boas práticas de normalização e integridade referencial.
+Descrição: Controla o volume de combustível disponível em cada bomba.
